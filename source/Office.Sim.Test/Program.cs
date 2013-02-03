@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Autofac;
 using Office.Sim.Core;
+using Office.Sim.Core.Graphics;
+using Office.Sim.Core.Graphics.OpenTK;
 using Office.Sim.Core.Messaging;
 
 namespace Office.Sim.Test
@@ -17,7 +19,6 @@ namespace Office.Sim.Test
             using (var game = container.Resolve<IGameEngine>())
             {
                 game.Bus.Messages.Subscribe(Console.WriteLine);
-                game.LoadLevel(new TestLevel());
                 game.Start();
                 Console.ReadLine();
             }
@@ -27,12 +28,13 @@ namespace Office.Sim.Test
         public class ContainerSetup
         {
             private ContainerBuilder _builder;
-
             public IContainer BuildContainer()
             {
                 _builder = new ContainerBuilder();
                 _builder.RegisterType<GameEngine>().As<IGameEngine>().SingleInstance();
                 _builder.RegisterType<MessageBus>().As<IMessageBus>().SingleInstance();
+                _builder.RegisterType<OpenTKGraphicsEngine>().As<IGraphicsEngine>().SingleInstance();
+                _builder.RegisterType<TestLevel>().As<ILevel>().SingleInstance();
                 return _builder.Build();
             }
         }

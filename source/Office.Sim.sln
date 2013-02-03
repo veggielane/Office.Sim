@@ -9,6 +9,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Office.Sim.Core.Specs", "Of
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Office.Sim.Test", "Office.Sim.Test\Office.Sim.Test.csproj", "{6BC26A81-A662-42B5-A664-A50185729F5D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Office.Sim.Core.Graphics.OpenTK", "Office.Sim.Core.Graphics.OpenTK\Office.Sim.Core.Graphics.OpenTK.csproj", "{E3F171B7-7EE4-4C2E-9BC9-31A11F9A78BB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{C2CEEA26-06FB-4907-94CB-A46ACDBB0CE9}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +36,10 @@ Global
 		{6BC26A81-A662-42B5-A664-A50185729F5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6BC26A81-A662-42B5-A664-A50185729F5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6BC26A81-A662-42B5-A664-A50185729F5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3F171B7-7EE4-4C2E-9BC9-31A11F9A78BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3F171B7-7EE4-4C2E-9BC9-31A11F9A78BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3F171B7-7EE4-4C2E-9BC9-31A11F9A78BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3F171B7-7EE4-4C2E-9BC9-31A11F9A78BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

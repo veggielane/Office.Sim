@@ -9,6 +9,7 @@ namespace Office.Sim.Core
 {
     public interface IGameEngine:IHasMessageBus,IDisposable
     {
+        ILevel Level { get; }
         void LoadLevel(ILevel level);
         void Start();
         void Stop();
