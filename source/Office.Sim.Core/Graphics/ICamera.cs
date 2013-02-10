@@ -14,7 +14,7 @@ namespace Office.Sim.Core.Graphics
         double Far { get; }
 
         Mat4 Model { get; set; }
-        Mat4 View { get; }
+        Mat4 View { get; set; }
         Mat4 Projection { get; set; }
         Mat4 MVP { get; }
 

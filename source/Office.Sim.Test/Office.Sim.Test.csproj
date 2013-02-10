@@ -62,10 +62,19 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Veg.Maths, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Veg.Maths.1.0.30205-CI2432\lib\net45\Veg.Maths.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestCorner.cs" />
+    <Compile Include="TestGameEngine.cs" />
+    <Compile Include="TestLevel.cs" />
+    <Compile Include="TestMap.cs" />
+    <Compile Include="TestTile.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

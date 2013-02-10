@@ -1,18 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Autofac;
 using Office.Sim.Core;
+using Office.Sim.Core.GameObjects;
 using Office.Sim.Core.Graphics;
 using Office.Sim.Core.Graphics.OpenTK;
+using Office.Sim.Core.Mapping;
 using Office.Sim.Core.Messaging;
+using Office.Sim.Core.Timing;
 
 namespace Office.Sim.Test
 {
     class Program
     {
+        public class ContainerSetup
+        {
+            private ContainerBuilder _builder;
+            public IContainer BuildContainer()
+            {
+                _builder = new ContainerBuilder();
+
+                _builder.RegisterType<TestGameEngine>().As<IGameEngine>().SingleInstance();
+                _builder.RegisterType<Timer>().As<ITimer>().SingleInstance();
+
+
+
+                _builder.RegisterType<MessageBus>().As<IMessageBus>().SingleInstance();
+                _builder.RegisterType<OpenTKGraphicsEngine>().As<IGraphicsEngine>().SingleInstance();
+                _builder.RegisterType<TestLevel>().As<ILevel>().SingleInstance();
+
+                _builder.RegisterType<TestGameObjectFactory>().As<IGameObjectFactory>().SingleInstance();
+
+                
+
+
+              //  _builder.RegisterType<AutofacObjectCreator>().As<IObjectCreator>();
+
+
+                return _builder.Build();
+            }
+        }
+
         static void Main(string[] args)
         {
             var container = new ContainerSetup().BuildContainer();
@@ -25,66 +55,25 @@ namespace Office.Sim.Test
             Console.ReadLine();
         }
 
-        public class ContainerSetup
+        public class TestGameObjectFactory:BaseGameObjectFactory
         {
-            private ContainerBuilder _builder;
-            public IContainer BuildContainer()
-            {
-                _builder = new ContainerBuilder();
-                _builder.RegisterType<GameEngine>().As<IGameEngine>().SingleInstance();
-                _builder.RegisterType<MessageBus>().As<IMessageBus>().SingleInstance();
-                _builder.RegisterType<OpenTKGraphicsEngine>().As<IGraphicsEngine>().SingleInstance();
-                _builder.RegisterType<TestLevel>().As<ILevel>().SingleInstance();
-                return _builder.Build();
-            }
+            
         }
 
-        public class TestLevel:ILevel
+        /*
+        public class AutofacObjectCreator:IObjectCreator
         {
-            public IMap Map { get; private set; }
-            public TestLevel()
-            {
-                Map = new TestMap(12);
-            }
-        }
+            private readonly IContainer _container;
 
-        public class TestMap:IMap
-        {
-            public ITile[,] Tiles { get; private set; }
-            public TestMap(int size)
+            public AutofacObjectCreator(IContainer container)
             {
-                Tiles = new ITile[12,12];
-                for (var i = 0; i < size; i++)
-                {
-                    for (var j = 0; j < size; j++)
-                    {
-                        Tiles[i,j] = new TestTile(0);
-                    }
-                }
+                _container = container;
             }
 
-            public override string ToString()
+            public T Create<T>()
             {
-                var sb = new StringBuilder();
-                for (var i = 0; i < Tiles.GetLength(0); i++)
-                {
-                    for (var j = 0; j < Tiles.GetLength(1); j++)
-                    {
-                        sb.Append(Tiles[i, j].Height);
-                    }
-                    sb.AppendLine();
-                }
-                return sb.ToString();
+                return _container.Resolve<T>();
             }
-        }
-
-        public class TestTile:ITile
-        {
-            public int Height { get; private set; }
-            public TestTile(int height)
-            {
-                Height = height;
-            }
-        }
+        }*/
     }
 }

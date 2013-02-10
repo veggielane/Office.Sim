@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Office.Sim.Core.Mapping;
 using Office.Sim.Core.Messaging;
 using OpenTK;
 using OpenTK.Graphics;
@@ -58,10 +59,12 @@ namespace Office.Sim.Core.Graphics.OpenTK
 
 
         private IShaderProgram _shader;
-        private VBO _vbo;
+  
         private VAO _vao;
+        private VAO _vao2;
+
         private CameraUBO _ubo;
-        private readonly MainCamera _camera;
+        private readonly ICamera _camera;
 
         public Window(IMessageBus bus, ILevel level)
             : base(1280, 720, new GraphicsMode(32, 0, 0, 4), "OpenCAD")
@@ -73,13 +76,12 @@ namespace Office.Sim.Core.Graphics.OpenTK
             _camera = new MainCamera();
 
             Mouse.WheelChanged += (sender, args) =>
-            {
-                _camera.Eye += new Vect3(0, 0, args.DeltaPrecise * -2.0);
+                {
+                    _camera.View = _camera.View* Mat4.Translate(0, 0, args.DeltaPrecise * -10.0);
+                //_camera.Eye += new Vect3(0, 0, args.DeltaPrecise * -10.0);
+               // Console.WriteLine(_camera.Eye);
             };
         }
-
-
-
 
         protected override void OnLoad(EventArgs e)
         {
@@ -89,50 +91,62 @@ namespace Office.Sim.Core.Graphics.OpenTK
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
             GL.PointSize(5f);
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
 
             _ubo = new CameraUBO();
             _shader = new BasicShaderProgram(_ubo);
-            var data = new List<Vertex>
-            {
+            var data = new List<Vertex>{};
 
-            };
+            var green = new Color4(0.156f, 0.627f, 0.353f, 1.0f).ToVector4();
 
-
-            var size = 100f;
             for (var i = 0; i < _level.Map.Tiles.GetLength(0); i++)
             {
                 for (var j = 0; j < _level.Map.Tiles.GetLength(1); j++)
                 {
-                    data.Add(new Vertex() { Colour = Color4.LightYellow.ToVector4(), Position = new Vector3(i * size, j * size, _level.Map.Tiles[i, j].Height) });
-                    data.Add(new Vertex() { Colour = Color4.LightYellow.ToVector4(), Position = new Vector3(i * size + (size / 2f), j * size + (- size / 2f), _level.Map.Tiles[i, j].Height) });
-                    data.Add(new Vertex() { Colour = Color4.LightYellow.ToVector4(), Position = new Vector3(i * size + (size / 2f), j * size + (size / 2f), _level.Map.Tiles[i, j].Height) });
-
-                    data.Add(new Vertex() { Colour = Color4.LightYellow.ToVector4(), Position = new Vector3(i * size, j * size, 0) });
-                    data.Add(new Vertex() { Colour = Color4.LightYellow.ToVector4(), Position = new Vector3(i * size + (-size / 2f), j * size + (-size / 2f), _level.Map.Tiles[i, j].Height) });
-                    data.Add(new Vertex() { Colour = Color4.LightYellow.ToVector4(), Position = new Vector3(i * size + (size / 2f), j * size + (-size / 2f), _level.Map.Tiles[i, j].Height) });
-
-                    data.Add(new Vertex() { Colour = Color4.LightYellow.ToVector4(), Position = new Vector3(i * size, j * size, 0) });
-                    data.Add(new Vertex() { Colour = Color4.LightYellow.ToVector4(), Position = new Vector3(i * size + (-size / 2f), j * size + (size / 2f), _level.Map.Tiles[i, j].Height) });
-                    data.Add(new Vertex() { Colour = Color4.LightYellow.ToVector4(), Position = new Vector3(i * size + (-size / 2f), j * size + (-size / 2f), _level.Map.Tiles[i, j].Height) });
-
-                    data.Add(new Vertex() { Colour = Color4.LightYellow.ToVector4(), Position = new Vector3(i * size, j * size, _level.Map.Tiles[i, j].Height) });
-                    data.Add(new Vertex() { Colour = Color4.LightYellow.ToVector4(), Position = new Vector3(i * size + (size / 2f), j * size + (size / 2f), _level.Map.Tiles[i, j].Height) });
-                    data.Add(new Vertex() { Colour = Color4.LightYellow.ToVector4(), Position = new Vector3(i * size + (-size / 2f), j * size + (size / 2f), _level.Map.Tiles[i, j].Height) });
-
-
-
-                   // data.Add(new Vertex() { Colour = Color4.LightYellow.ToVector4(), Position = new Vector3(i, j, _level.Map.Tiles[i, j].Height) });
+                    data.Add(new Vertex { Colour = green, Position = _level.Map.Tiles[i, j].C1.Position.ToVector3() });
+                    data.Add(new Vertex { Colour = green, Position = _level.Map.Tiles[i, j].C3.Position.ToVector3() });
+                    data.Add(new Vertex { Colour = green, Position = _level.Map.Tiles[i, j].C2.Position.ToVector3() });
+                    data.Add(new Vertex { Colour = green, Position = _level.Map.Tiles[i, j].C1.Position.ToVector3() });
+                    data.Add(new Vertex { Colour = green, Position = _level.Map.Tiles[i, j].C4.Position.ToVector3() });
+                    data.Add(new Vertex { Colour = green, Position = _level.Map.Tiles[i, j].C3.Position.ToVector3() });
                 }
             }
 
 
+            foreach (var tile in Enumerable.Range(0, _level.Map.Tiles.GetLength(1)).Select(col => _level.Map.Tiles[0, col]))
+            {
 
-            _vbo = new VBO(data) { BeginMode = BeginMode.Triangles };
-            _vao = new VAO(_shader, _vbo);
+                data.Add(new Vertex { Colour = Color4.Brown.ToVector4(), Position = new Vect3(tile.C1.Position.X,tile.C1.Position.Y,-10).ToVector3()});
+                data.Add(new Vertex { Colour = Color4.Brown.ToVector4(), Position = tile.C1.Position.ToVector3() });
+                data.Add(new Vertex { Colour = Color4.Brown.ToVector4(), Position = tile.C2.Position.ToVector3() });
+                                    
+                data.Add(new Vertex { Colour = Color4.Brown.ToVector4(), Position = tile.C2.Position.ToVector3() });
+                data.Add(new Vertex { Colour = Color4.Brown.ToVector4(), Position = new Vect3(tile.C2.Position.X, tile.C2.Position.Y, -10).ToVector3() });
+                data.Add(new Vertex { Colour = Color4.Brown.ToVector4(), Position = new Vect3(tile.C1.Position.X, tile.C1.Position.Y, -10).ToVector3() });
+            }
+
+            foreach (var tile in Enumerable.Range(0, _level.Map.Tiles.GetLength(0)).Select(row => _level.Map.Tiles[row,0]))
+            {
+
+                data.Add(new Vertex { Colour = Color4.Brown.ToVector4(), Position = tile.C4.Position.ToVector3() });
+                data.Add(new Vertex { Colour = Color4.Brown.ToVector4(), Position = tile.C1.Position.ToVector3() });
+                data.Add(new Vertex { Colour = Color4.Brown.ToVector4(), Position = new Vect3(tile.C4.Position.X, tile.C4.Position.Y, -10).ToVector3() });
+
+                data.Add(new Vertex { Colour = Color4.Brown.ToVector4(), Position = tile.C1.Position.ToVector3() });
+                data.Add(new Vertex { Colour = Color4.Brown.ToVector4(), Position = new Vect3(tile.C1.Position.X, tile.C1.Position.Y, -10).ToVector3() });
+                data.Add(new Vertex { Colour = Color4.Brown.ToVector4(), Position = new Vect3(tile.C4.Position.X, tile.C4.Position.Y, -10).ToVector3() });
+
+            }
+
+
+            _vao = new VAO(_shader,  new VBO(data) { BeginMode = BeginMode.Triangles });
+
+
 
             
 
+            var data2 = data.Select(v => new Vertex() {Colour = Color4.Black.ToVector4(), Position = v.Position + new Vector3(0,0,0.05f)});
+
+            _vao2 = new VAO(_shader, new VBO(data2) { BeginMode = BeginMode.Lines });
 
 
             var err = GL.GetError();
@@ -142,29 +156,61 @@ namespace Office.Sim.Core.Graphics.OpenTK
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
+            var speed = 0.05;
             if (Keyboard[Key.Left])
             {
-                _camera.Eye += new Vect3(-0.05, 0, 0);
-                _camera.Target += new Vect3(-0.05, 0, 0);
+                _camera.Eye += new Vect3(-speed, 0, speed);
+                _camera.Target += new Vect3(-speed, 0, speed);
             }
 
             if (Keyboard[Key.Right])
             {
-                _camera.Eye += new Vect3(0.05, 0, 0);
-                _camera.Target += new Vect3(0.05, 0, 0);
+                _camera.View *= Mat4.Translate(1,0,0);
             }
 
             if (Keyboard[Key.Up])
             {
-                _camera.Eye += new Vect3(0, 0.05, 0);
-                _camera.Target += new Vect3(0, 0.05, 0);
+                _camera.Eye += new Vect3(speed, 0, -speed);
+                _camera.Target += new Vect3(speed, 0, -speed);
             }
 
             if (Keyboard[Key.Down])
             {
-                _camera.Eye += new Vect3(0, -0.05, 0);
-                _camera.Target += new Vect3(0, -0.05, 0);
+                _camera.Eye += new Vect3(-speed, 0, speed);
+                _camera.Target += new Vect3(-speed, 0, speed);
             }
+
+            if (Keyboard[Key.A])
+            {
+                _camera.View *= Mat4.RotateY(Angle.FromDegrees(0.5));
+            }
+
+            if (Keyboard[Key.D])
+            {
+                _camera.View *= Mat4.RotateY(Angle.FromDegrees(-0.5));
+            }
+
+            if (Keyboard[Key.W])
+            {
+                _camera.View *= Mat4.RotateX(Angle.FromDegrees(0.5));
+            }
+
+
+            if (Keyboard[Key.S])
+            {
+                _camera.View *= Mat4.RotateX(Angle.FromDegrees(-0.5));
+            }
+
+
+            if (Keyboard[Key.Q])
+            {
+                _camera.View *= Mat4.RotateZ(Angle.FromDegrees(0.5));
+            }
+            if (Keyboard[Key.E])
+            {
+                _camera.View *= Mat4.RotateZ(Angle.FromDegrees(-0.5));
+            }
+
             _ubo.Update(_camera);
         }
 
@@ -174,13 +220,12 @@ namespace Office.Sim.Core.Graphics.OpenTK
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.ClearColor(new Color4(0.137f, 0.121f, 0.125f, 0f));
 
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+            _vao.Render();
 
+            //GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
 
-            using (new Bind(_vao))
-            {
-                GL.DrawArrays(_vao.VBO.BeginMode, 0, _vao.VBO.Count);
-            }
-
+            //_vao2.Render();
 
             SwapBuffers();
             ErrorCode err = GL.GetError();
@@ -192,15 +237,10 @@ namespace Office.Sim.Core.Graphics.OpenTK
         protected override void OnResize(EventArgs e)
         {
             GL.Viewport(0, 0, Width, Height);
+            
             _camera.Resize(Width, Height);
         }
     }
-
-
-
- 
-
- 
 
      public class BasicShaderProgram : BaseShaderProgram
      {
@@ -273,20 +313,20 @@ void main() {
      }
 
 
-     public class MainCamera : ICamera
+
+     public class OrthographicCamera : ICamera
      {
          private int _width;
          private int _height;
-         public MainCamera()
+         public OrthographicCamera()
          {
 
-             Near = 0f;
-             Far = 512.0f;
-             Model = Mat4.Identity;
-             Eye = Vect3.Zero;
+             Near = -200f;
+             Far = 5000f;
+             Model = Mat4.Translate(-20, -20, 0);
              Target = Vect3.Zero;
-             Up = Vect3.UnitY;
-             Eye = new Vect3(0.0f, 0.0f, 5.0f);
+             Up = -Vect3.UnitZ;
+             Eye = new Vect3(Math.Sqrt(1 / 3.0), Math.Sqrt(1 / 3.0), Math.Sqrt(1 / 3.0));
          }
 
          public double Near { get; private set; }
@@ -321,9 +361,20 @@ void main() {
          {
              _width = width;
              _height = height;
-             //Projection = Mat4.CreatePerspectiveFieldOfView(Math.PI / 4, _width / (float)_height, Near, Far);
-             Projection = Matrix4.CreateOrthographic(width, height, (float)Near, (float)Far).ToMat4();
+             Projection = Matrix4.CreateOrthographic(width / 10f, height / 10f, (float)Near, (float)Far).ToMat4();
+         }
+
+
+         Mat4 ICamera.View
+         {
+             get
+             {
+                 throw new NotImplementedException();
+             }
+             set
+             {
+                 throw new NotImplementedException();
+             }
          }
      }
-
 }

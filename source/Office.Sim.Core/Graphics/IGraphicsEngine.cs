@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Office.Sim.Core.Mapping;
 
 namespace Office.Sim.Core.Graphics
 {
